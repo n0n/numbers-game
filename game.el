@@ -24,31 +24,48 @@
   (let ((list ()))
     (while (not (eq len (length list)))
       (add-to-list 'list (random len)))
+    (setq list (delq 0 list)) ;; удаляем ноль
     (symbol-value 'list)))
 
 ;; (n0n/gen-random-list)
 
 (defun n0n/gen-line ()
   "generate line"
-  (let ((line)
-	(numbers (n0n/gen-random-list 30))) ;; parametr length list
-    (while (> (length numbers) 0)
-      (if (eq 0 (random 5))
-	  (setq line (concat line " " (number-to-string (pop numbers)) ","))
-	(setq line (concat line " ,"))))
-     (symbol-value 'line)))
+  (let ((buff (get-buffer-create "game-buffer" 1))
+	(numbers (n0n/gen-random-list 31))
+	(len 15)) ;; parametr length list 
+    (with-current-buffer buff
+      (erase-buffer)
+      (goto-char (point-min))
+      (org-mode)
+      (while (> (length numbers) 0)
+	(if (eq (% (point) 15) 0)
+	    (insert "\n"))
+	(if (eq 0 (random 5))
+	    (insert (number-to-string (pop numbers)) ",")
+	  (insert ","))))))
 
 ;; (n0n/gen-line)
 
+(print (length (n0n/gen-line)))
+
 (defun n0n/game ()
   "main function"
-  (let* ((line (n0n/gen-line))
-	(table "")
-	(div (/ (length line) 15)))
-    (dotimes (i div) ;; parametr line length
-      (setq table (concat table (substring line (* i 15) (+ (* i 15) 15)) "\n"))
-      (message table))))
+  (let ((list (n0n/gen-line))
+	(tmp '())) ;; parametr line length
+    (dotimes (i (length list))
+      (if (eq (/ i 20) 0)
+	  (setq tmp (cons "\n" tmp))
+	(setq tmp (cons (nth i list) tmp)))
+      (message (format "%s" tmp))))
 
 ;; (n0n/game)
 
-",,,,,,,,5,,9,,,,,,,,,,,,,,7,,12,,,,,,3,8,,,,,,,,,,14,10,,,,,,,13,4,,,,2,,,,,,6,0,,,,1,11,"
+;; #+HTML_HEAD: <style>table {width: 100%;} table, th, td {border: 1px solid;}</style>
+;; #+ATTR_HTML: :border 1 :rules all :frame border
+  
+;; ",,,,,,,,5,,9,,,,,,,,,,,,,,7,,12,,,,,,3,8,,,,,,,,,,14,10,,,,,,,13,4,,,,2,,,,,,6,0,,,,1,11,"
+
+(setq buff (generate-new-buffer "game-buffer" 1))
+(with-current-buffer buff
+  (insert "test\n test1"))
