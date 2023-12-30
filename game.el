@@ -29,43 +29,49 @@
 
 ;; (n0n/gen-random-list)
 
-(defun n0n/gen-line ()
+(defun n0n/gen-buff (&optional name)
   "generate line"
+  (unless name (setq name "Nobody"))
   (let ((buff (get-buffer-create "game-buffer" 1))
-	(numbers (n0n/gen-random-list 31))
-	(len 15)) ;; parametr length list 
+	(numbers (n0n/gen-random-list 81))
+	(len 24))                     ;; parametr length list 
     (with-current-buffer buff
       (erase-buffer)
       (goto-char (point-min))
+      (insert (format "#+TITLE: %s\n" name))
+      (insert "#+HTML_HEAD: <style>table, th, td {border: 1px solid;} img {margin-top: 90px}</style>\n\n")
       (org-mode)
       (while (> (length numbers) 0)
-	(if (eq (% (point) 15) 0)
+	(if (eq (% (point) len) 0)
 	    (insert "\n"))
-	(if (eq 0 (random 5))
+	(if (eq 0 (random 4))
 	    (insert (number-to-string (pop numbers)) ",")
-	  (insert ","))))))
+	  (insert ",")))
+      (insert "\n\n\n[[file:grid_40x10_plain.svg]]\n\n"))))
 
-;; (n0n/gen-line)
-
-(print (length (n0n/gen-line)))
+;; (n0n/gen-buff "Папа")
 
 (defun n0n/game ()
   "main function"
-  (let ((list (n0n/gen-line))
+  (let ((list (n0n/gen-buff))
 	(tmp '())) ;; parametr line length
     (dotimes (i (length list))
       (if (eq (/ i 20) 0)
 	  (setq tmp (cons "\n" tmp))
 	(setq tmp (cons (nth i list) tmp)))
-      (message (format "%s" tmp))))
+      (message (format "%s" tmp)))))
 
 ;; (n0n/game)
 
-;; #+HTML_HEAD: <style>table {width: 100%;} table, th, td {border: 1px solid;}</style>
-;; #+ATTR_HTML: :border 1 :rules all :frame border
-  
-;; ",,,,,,,,5,,9,,,,,,,,,,,,,,7,,12,,,,,,3,8,,,,,,,,,,14,10,,,,,,,13,4,,,,2,,,,,,6,0,,,,1,11,"
+;; #+HTML_HEAD: <style>table, th, td {border: 1px solid;} img {margin-top: 150px}</style>
+;; file:grid_40x10_plain.svg
 
-(setq buff (generate-new-buffer "game-buffer" 1))
-(with-current-buffer buff
-  (insert "test\n test1"))
+;; variable 
+;; variable org-html-head-include-default-style set to nil to disable default css style
+;; variable org-html-preamble: nil & org-html-postamble: nil to disable preamble & postamble
+
+(require 'ox-html)
+(setq org-html-head-include-default-style nil
+      org-html-preamble nil
+      org-html-postamble nil)
+  
