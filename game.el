@@ -1,19 +1,13 @@
+;; Генерируем орг-буффер с двумя таблицами для распечатки и игры в
+;; цыфры. Одна таблица содержит цифры расположенные в случайном
+;; порядке для поиска. Вторая таблица пустая статичная таблица svg для
+;; заполнения крестиками.
 
-;; кароче получается что нужно делать через лист, т.к. в векторах нет
-;; функций типа pop. генерируем лист случайных чисел в случайном
-;; порядке, потом по одному вытаскиваем от туда айтемы
-
-;; при переводе списка в строку и ее последующем делении рубятся
-;; двухзначные числа, что не есть хорошо, поэтому нужно генеририть
-;; список и потом его нарезать. Режем сначала целыми кусками, потом
-;; добиваем остаток пустыми столбцами.
-
-;; н-р длина строки (86) - 86 / 15 = 5.733, значит 5 полных циклов
-;; проходим, остаток потом выделяем с помощью выражения (86 - 15*5) =
-;; = 11, позиции НАЧ - 15*5 = 75 конец 75 + 11 = 86 или просто длина
-
-;; либо генерить строку с помощью " ," пробелов и запятых, и потом
-;; резать токлько по пробелам через регексп или set-fill-colon
+;; После генерации требуется доработка ручками, т.к. строки
+;; генерируются не совсем корректно. После чего нужно выделать строки
+;; с цифрами и сформировать таблицу через функцию
+;; org-table-create-or-convert-from-region, затем экспортировать буфер
+;; в html файл и распечатать с помощью браузера.
 
 
 (defun n0n/gen-random-list (&optional len)
@@ -47,7 +41,7 @@
 	(if (eq 0 (random 4))
 	    (insert (number-to-string (pop numbers)) ",")
 	  (insert ",")))
-      (insert "\n\n\n[[file:grid_40x10_plain.svg]]\n\n"))))
+      (insert "\n\n\n[[file:./images/grid_40x10_plain.svg]]\n\n"))))
 
 ;; (n0n/gen-buff "Папа")
 
@@ -62,6 +56,16 @@
       (message (format "%s" tmp)))))
 
 ;; (n0n/game)
+
+;; HOW TO PLAY
+;; Open current file in emacs and M-x (eval-buffer)
+;; Goto (n0n/game), evaluate, then switch to buffer "game-buffer"
+;; Correct lines if need
+;; Select lines and make C-c | (org-table-create-or-convert-from-region)
+;; Change player's name in title
+;; Make C-c C-e (org-export-dispatch) and h h - save file
+;; Open saved file in browser and print it, repeate 
+
 
 ;; #+HTML_HEAD: <style>table, th, td {border: 1px solid;} img {margin-top: 150px}</style>
 ;; file:grid_40x10_plain.svg
